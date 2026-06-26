@@ -29,7 +29,13 @@ def get_user_by_email(db: Session, email: str) -> User | None:
 
 def create_user(db: Session, user: UserCreate) -> User:
     """Create a new user and return it."""
-    db_user = User(**user.model_dump())
+    from auth import get_password_hash
+    db_user = User(
+        username=user.username,
+        email=user.email,
+        avatar_url=user.avatar_url,
+        hashed_password=get_password_hash(user.password),
+    )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
