@@ -20,7 +20,7 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     # Relationships
-    todos = relationship("Todo", back_populates="owner")
+    todos = relationship("Todo", foreign_keys="Todo.owner_id", back_populates="owner")
 
     def to_dict(self) -> dict:
         """Convert model to dict for serialization."""
@@ -50,10 +50,12 @@ class Todo(Base):
 
     # Foreign keys
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    assignee_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     parent_id = Column(Integer, ForeignKey("todos.id"), nullable=True)
 
     # Relationships
-    owner = relationship("User", back_populates="todos")
+    owner = relationship("User", foreign_keys=[owner_id], back_populates="todos")
+    assignee = relationship("User", foreign_keys=[assignee_id])
     parent = relationship("Todo", remote_side=[id], back_populates="subtasks")
     subtasks = relationship("Todo", back_populates="parent", cascade="all, delete-orphan")
     depends_on = relationship("Todo", secondary="todo_dependencies",

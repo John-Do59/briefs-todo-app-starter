@@ -80,54 +80,54 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 # Todo endpoints
 @app.get("/todos", response_model=list[schemas.TodoResponse])
-def list_todos(db: Session = Depends(get_db)):
-    """List all todos."""
-    return crud.get_todos(db)
+def list_todos(db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
+    """List all todos for the current user."""
+    return crud.get_todos(db, current_user.id)
 
 
 @app.get("/todos/{todo_id}", response_model=schemas.TodoResponse)
-def get_todo(todo_id: int, db: Session = Depends(get_db)):
+def get_todo(todo_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
     """Get a single todo by ID."""
-    todo = crud.get_todo(db, todo_id)
+    todo = crud.get_todo(db, todo_id, current_user.id)
     if not todo:
         raise HTTPException(status_code=404, detail="Todo not found")
     return todo
 
 
 @app.post("/todos", response_model=schemas.TodoResponse, status_code=201)
-def create_todo(todo: schemas.TodoCreate, db: Session = Depends(get_db)):
+def create_todo(todo: schemas.TodoCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
     """Create a new todo."""
-    return crud.create_todo(db, todo)
+    return crud.create_todo(db, todo, current_user.id)
 
 
 @app.put("/todos/{todo_id}", response_model=schemas.TodoResponse)
-def update_todo(todo_id: int, todo: schemas.TodoUpdate, db: Session = Depends(get_db)):
+def update_todo(todo_id: int, todo: schemas.TodoUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
     """Update an existing todo."""
-    updated = crud.update_todo(db, todo_id, todo)
+    updated = crud.update_todo(db, todo_id, todo, current_user.id)
     if not updated:
         raise HTTPException(status_code=404, detail="Todo not found")
     return updated
 
 
 @app.delete("/todos/{todo_id}", status_code=204)
-def delete_todo(todo_id: int, db: Session = Depends(get_db)):
+def delete_todo(todo_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
     """Delete a todo."""
-    if not crud.delete_todo(db, todo_id):
+    if not crud.delete_todo(db, todo_id, current_user.id):
         raise HTTPException(status_code=404, detail="Todo not found")
 
 
 # Todo dependency endpoints
 @app.post("/todos/{todo_id}/dependencies/{depends_on_id}", status_code=201)
-def add_dependency(todo_id: int, depends_on_id: int, db: Session = Depends(get_db)):
+def add_dependency(todo_id: int, depends_on_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
     """Add a dependency: todo_id depends on depends_on_id."""
     if todo_id == depends_on_id:
         raise HTTPException(status_code=400, detail="A todo cannot depend on itself")
-    if not crud.add_todo_dependency(db, todo_id, depends_on_id):
+    if not crud.add_todo_dependency(db, todo_id, depends_on_id, current_user.id):
         raise HTTPException(status_code=404, detail="Todo not found")
 
 
 @app.delete("/todos/{todo_id}/dependencies/{depends_on_id}", status_code=204)
-def remove_dependency(todo_id: int, depends_on_id: int, db: Session = Depends(get_db)):
+def remove_dependency(todo_id: int, depends_on_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
     """Remove a dependency."""
-    if not crud.remove_todo_dependency(db, todo_id, depends_on_id):
+    if not crud.remove_todo_dependency(db, todo_id, depends_on_id, current_user.id):
         raise HTTPException(status_code=404, detail="Dependency not found")

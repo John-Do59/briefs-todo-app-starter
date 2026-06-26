@@ -7,6 +7,9 @@ function makeTodo(overrides: Partial<Todo>): Todo {
 		title: 'Sample',
 		description: null,
 		completed: false,
+		owner_id: 1,
+		assignee_id: null,
+		assignee: null,
 		created_at: '2026-04-30T10:00:00Z',
 		updated_at: null,
 		...overrides

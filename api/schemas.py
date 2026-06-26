@@ -40,6 +40,7 @@ class TodoBase(BaseModel):
     description: str | None = Field(None, max_length=500)
     completed: bool = False
     owner_id: int | None = None
+    assignee_id: int | None = None
     parent_id: int | None = None
 
 
@@ -53,7 +54,10 @@ class TodoUpdate(BaseModel):
     title: str | None = Field(None, min_length=1, max_length=200)
     description: str | None = Field(None, max_length=500)
     completed: bool | None = None
+    deadline: datetime | None = None
+    recurrence: str | None = Field(None, max_length=50)
     owner_id: int | None = None
+    assignee_id: int | None = None
     parent_id: int | None = None
 
 
@@ -65,6 +69,8 @@ class TodoResponse(TodoBase):
     id: int
     created_at: datetime
     updated_at: datetime | None = None
+    owner: UserResponse | None = None
+    assignee: UserResponse | None = None
     subtasks: list["TodoResponse"] = []
     depends_on: list[int] = []
 

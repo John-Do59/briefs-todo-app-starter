@@ -5,6 +5,7 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			'$env/dynamic/public': fileURLToPath(new URL('./tests/mocks/env-public.ts', import.meta.url)),
+			'$app/environment': fileURLToPath(new URL('./tests/mocks/app-environment.ts', import.meta.url)),
 			$lib: fileURLToPath(new URL('./src/lib', import.meta.url))
 		}
 	},
