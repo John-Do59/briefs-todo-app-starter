@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# 1. Check for secrets
+sh .claude/hooks/pre_commit_secrets.sh
