@@ -1,0 +1,4 @@
+
+
+# 1. Check for secrets
+sh .claude/hooks/pre_commit_secrets.sh
