@@ -11,7 +11,7 @@ def test_list_users_empty(client):
 def test_create_user(client):
     response = client.post(
         "/users",
-        json={"username": "johndoe", "email": "john@example.com", "avatar_url": "https://example.com/avatar.jpg"},
+        json={"username": "johndoe", "email": "john@example.com", "password": "password123", "avatar_url": "https://example.com/avatar.jpg"},
     )
 
     assert response.status_code == 201
@@ -23,23 +23,22 @@ def test_create_user(client):
 
 
 def test_create_user_duplicate_username(client):
-    client.post("/users", json={"username": "jane", "email": "jane1@example.com"})
-    response = client.post("/users", json={"username": "jane", "email": "jane2@example.com"})
+    client.post("/users", json={"username": "jane", "email": "jane1@example.com", "password": "password123"})
+    response = client.post("/users", json={"username": "jane", "email": "jane2@example.com", "password": "password123"})
     assert response.status_code == 400
 
 
 def test_create_user_duplicate_email(client):
-    client.post("/users", json={"username": "jake1", "email": "jake@example.com"})
-    response = client.post("/users", json={"username": "jake2", "email": "jake@example.com"})
+    client.post("/users", json={"username": "jake1", "email": "jake@example.com", "password": "password123"})
+    response = client.post("/users", json={"username": "jake2", "email": "jake@example.com", "password": "password123"})
     assert response.status_code == 400
 
 
 def test_get_user(client):
-    created = client.post("/users", json={"username": "bob", "email": "bob@example.com"}).json()
+    created = client.post("/users", json={"username": "bob", "email": "bob@example.com", "password": "password123"}).json()
     response = client.get(f"/users/{created['id']}")
     assert response.status_code == 200
     assert response.json()["username"] == "bob"
-
 
 def test_get_user_not_found(client):
     response = client.get("/users/9999")
@@ -69,7 +68,7 @@ def test_create_todo(client):
 
 
 def test_create_todo_with_owner(client):
-    user = client.post("/users", json={"username": "alice", "email": "alice@example.com"}).json()
+    user = client.post("/users", json={"username": "alice", "email": "alice@example.com", "password": "password123"}).json()
     response = client.post(
         "/todos",
         json={"title": "Alice's task", "owner_id": user["id"]},
