@@ -74,11 +74,11 @@ bun run preview                    # Preview the production build
 
 This directory contains reusable skills that extend the AI agent's capabilities.
 
-| Skill | Purpose |
-|-------|---------|
-| todo-app-test | Runs all tests for API and frontend |
-| todo-app-lint | Runs linting for the entire project |
-| todo-app-docker | Manages Docker Compose for the project |
+| Skill File | Purpose |
+|------------|---------|
+| test_runner.md | Runs all tests for API and frontend |
+| lint_check.md | Runs linting for the entire project |
+| docker_manage.md | Manages Docker Compose for the project |
 
 ### Commands Directory (.claude/commands/)
 

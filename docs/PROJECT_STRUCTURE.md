@@ -33,9 +33,9 @@ todo-app/
 │   └── README.md
 ├── .claude/                            # Claude Code configuration
 │   ├── skills/                         # Agent skills (auto-detected)
-│   │   ├── todo-app-test/         # Test runner skill
-│   │   ├── todo-app-lint/         # Linter skill
-│   │   └── todo-app-docker/       # Docker management skill
+│   │   ├── test_runner.md         # Test runner skill
+│   │   ├── lint_check.md         # Linter skill
+│   │   └── docker_manage.md       # Docker management skill
 │   ├── commands/                       # Slash commands
 │   │   ├── start.sh                    # /start - Start services
 │   │   └── test.sh                     # /test - Run all tests
