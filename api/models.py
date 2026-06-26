@@ -15,11 +15,25 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(50), unique=True, index=True, nullable=False)
     email = Column(String(100), unique=True, index=True, nullable=False)
+    hashed_password = Column(String(255), nullable=False)
     avatar_url = Column(String(255), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     # Relationships
     todos = relationship("Todo", back_populates="owner")
+
+    def to_dict(self) -> dict:
+        """Convert model to dict for serialization."""
+        from sqlalchemy.orm import class_mapper
+        mapper = class_mapper(self.__class__)
+        result = {column.key: getattr(self, column.key) for column in mapper.columns}
+        # Handle datetime conversion
+        for key, value in result.items():
+            if isinstance(value, datetime):
+                result[key] = value.isoformat()
+        # Remove hashed password from response
+        result.pop("hashed_password", None)
+        return result
 
 
 class Todo(Base):
@@ -46,6 +60,20 @@ class Todo(Base):
                               primaryjoin="Todo.id==todo_dependencies.c.todo_id",
                               secondaryjoin="Todo.id==todo_dependencies.c.depends_on_id",
                               backref="dependent_todos")
+
+    def to_dict(self) -> dict:
+        """Convert model to dict for serialization."""
+        from sqlalchemy.orm import class_mapper
+        mapper = class_mapper(self.__class__)
+        result = {column.key: getattr(self, column.key) for column in mapper.columns}
+        # Handle datetime conversion
+        for key, value in result.items():
+            if isinstance(value, datetime):
+                result[key] = value.isoformat()
+        # Handle relationships
+        result["subtasks"] = [subtask.to_dict() for subtask in self.subtasks]
+        result["depends_on"] = [dep.id for dep in self.depends_on]
+        return result
 
 
 class TodoDependency(Base):

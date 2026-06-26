@@ -1,11 +1,21 @@
 """FastAPI application entry point."""
 
-from fastapi import Depends, FastAPI, HTTPException
+from datetime import timedelta
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 import crud
 import schemas
+from auth import (
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    Token,
+    authenticate_user,
+    create_access_token,
+    get_current_active_user,
+)
 from database import Base, engine, get_db
+from models import User
 
 # Create all tables on startup
 Base.metadata.create_all(bind=engine)
@@ -15,6 +25,30 @@ app = FastAPI(
     description="REST API for managing to-do tasks",
     version="0.2.0",
 )
+
+
+# Auth endpoints
+@app.post("/token", response_model=Token)
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """Login to get access token."""
+    user = authenticate_user(db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+@app.get("/users/me", response_model=schemas.UserResponse)
+async def read_users_me(current_user: User = Depends(get_current_active_user)):
+    """Get current authenticated user."""
+    return current_user
 
 
 # User endpoints
