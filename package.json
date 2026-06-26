@@ -11,9 +11,10 @@
   },
   "packageManager": "bun@1.1.45",
   "scripts": {
-
+    "lint": "markdownlint \"**/*.md\" && yamllint docker-compose.yml .github/workflows/*.yml"
   },
   "devDependencies": {
-
+    "markdownlint-cli": "^0.49.0",
+    "yaml-lint": "^1.7.0"
   }
 }

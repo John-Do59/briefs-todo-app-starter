@@ -61,6 +61,8 @@ class TodoUpdate(BaseModel):
     parent_id: int | None = None
 
 
+from pydantic import BaseModel, Field, EmailStr, field_validator
+
 class TodoResponse(TodoBase):
     """Schema for todo responses including database-generated fields."""
 
@@ -74,5 +76,11 @@ class TodoResponse(TodoBase):
 
     model_config = {"from_attributes": True}
 
+    @field_validator("depends_on", mode="before")
+    @classmethod
+    def extract_dependency_ids(cls, v):
+        if not v:
+            return []
+        return [item.id if hasattr(item, "id") else item for item in v]
 
 TodoResponse.model_rebuild()
