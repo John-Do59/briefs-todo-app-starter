@@ -97,6 +97,16 @@ Event hooks that run automatically at specific times.
 |------|---------|
 | pre_commit_secrets.sh | Checks for secrets and .env files before commit |
 
+### Model Context Protocol (MCP)
+
+This project uses MCP to provide external capabilities to AI agents. The configuration is located in `mcp.json` at the root of the project.
+
+| Server | Purpose | Configuration |
+|--------|---------|---------------|
+| `github` | Interact with GitHub API (PRs, issues, repos) | Requires `GITHUB_PERSONAL_ACCESS_TOKEN` in env |
+| `context7` | Knowledge retrieval and context sharing | No extra config |
+| `sqlite` | Direct access to the `todo.db` database | No extra config |
+
 ---
 
 ## File Summaries
