@@ -1,22 +1,25 @@
 <script lang="ts">
-	import type { Todo, TodoUpdate } from '$lib/types';
+	import type { Todo, TodoUpdate, User } from '$lib/types';
 
 	interface Props {
 		todo: Todo;
+		users?: User[];
 		onToggle: (id: number, completed: boolean) => void | Promise<void>;
 		onSave: (id: number, patch: TodoUpdate) => void | Promise<void>;
 		onDelete: (id: number) => void | Promise<void>;
 	}
 
-	let { todo, onToggle, onSave, onDelete }: Props = $props();
+	let { todo, users = [], onToggle, onSave, onDelete }: Props = $props();
 
 	let editing = $state(false);
 	let titleDraft = $state('');
 	let descriptionDraft = $state('');
+	let assigneeDraft = $state<number | null>(null);
 
 	function startEdit() {
 		titleDraft = todo.title;
 		descriptionDraft = todo.description ?? '';
+		assigneeDraft = todo.assignee_id;
 		editing = true;
 	}
 
@@ -29,7 +32,8 @@
 		if (!trimmedTitle) return;
 		await onSave(todo.id, {
 			title: trimmedTitle,
-			description: descriptionDraft.trim() || null
+			description: descriptionDraft.trim() || null,
+			assignee_id: assigneeDraft
 		});
 		editing = false;
 	}
@@ -66,6 +70,15 @@
 					class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
 					placeholder="Description (optional)"
 				></textarea>
+				<select
+					bind:value={assigneeDraft}
+					class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+				>
+					<option value={null}>Unassigned</option>
+					{#each users as user}
+						<option value={user.id}>{user.username}</option>
+					{/each}
+				</select>
 				<div class="flex gap-2">
 					<button
 						type="submit"
@@ -97,6 +110,14 @@
 				>
 					{todo.description}
 				</p>
+			{/if}
+			{#if todo.assignee}
+				<div class="mt-2 flex items-center gap-1 text-xs text-indigo-600 bg-indigo-50 w-fit px-2 py-1 rounded">
+					{#if todo.assignee.avatar_url}
+						<img src={todo.assignee.avatar_url} alt="Avatar" class="w-4 h-4 rounded-full" />
+					{/if}
+					<span>Assigned to {todo.assignee.username}</span>
+				</div>
 			{/if}
 		{/if}
 	</div>

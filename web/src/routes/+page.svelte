@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { api } from '$lib/api';
 	import TodoItem from '$lib/components/TodoItem.svelte';
-	import type { Filter, Todo, TodoUpdate } from '$lib/types';
+	import type { Filter, Todo, TodoUpdate, User } from '$lib/types';
 
 	let todos = $state<Todo[]>([]);
+	let users = $state<User[]>([]);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 	let filter = $state<Filter>('all');
@@ -22,11 +23,14 @@
 		return todos;
 	});
 
-	async function loadTodos() {
+	async function loadData() {
 		loading = true;
 		error = null;
 		try {
-			todos = await api.listTodos();
+			[todos, users] = await Promise.all([
+				api.listTodos(),
+				api.listUsers()
+			]);
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Failed to load tasks.';
 		} finally {
@@ -86,7 +90,7 @@
 	}
 
 	$effect(() => {
-		loadTodos();
+		loadData();
 	});
 </script>
 
@@ -186,7 +190,7 @@
 	{:else}
 		<ul class="space-y-2">
 			{#each visibleTodos as todo (todo.id)}
-				<TodoItem {todo} onToggle={toggleTodo} onSave={saveTodo} onDelete={deleteTodo} />
+				<TodoItem {todo} {users} onToggle={toggleTodo} onSave={saveTodo} onDelete={deleteTodo} />
 			{/each}
 		</ul>
 	{/if}
