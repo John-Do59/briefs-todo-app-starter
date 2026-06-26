@@ -3,7 +3,7 @@
 ## Plan d'implémentation (Étape par étape)
 
 ### Phase 1 : Backend (FastAPI)
-1. **Modèles & Base de données** : 
+1. **Modèles & Base de données** :
    - Ajout du champ `assignee_id` à la table `todos` (clé étrangère vers `users.id`).
    - Mise à jour de la relation SQLAlchemy `assignee`.
 2. **Endpoints & Sécurité** :
@@ -50,7 +50,7 @@
    - **Solution** : Déplacement de `assignee_id` vers `TodoBase` dans `schemas.py` pour assurer sa sérialisation dès la création.
 
 4. **Gestion de l'état dans les scénarios BDD** :
-   - **Problème** : Des états partagés entre scénarios créaient de fausses erreurs 401. 
+   - **Problème** : Des états partagés entre scénarios créaient de fausses erreurs 401.
    - **Solution** : Groupement cohérent des scénarios dans `.feature` pour garantir un ordre robuste, et la conservation du jeton JWT entre la création et la vérification.
 
 ---
@@ -66,7 +66,7 @@ D'après les discussions passées sur le découpage du brief (Partie 1 à Partie
      - Le monitoring et la télémétrie (Sentry / Prometheus)
      - La conteneurisation avancée et l'orchestration (Kubernetes)
      - (Note: Nous avons déjà couvert les bases du linter (Biome/Bun) et Docker).
-   
+
 2. **Extensions Skills & MCP (Partie 2)** :
    - Nous avons défini qu'il fallait créer des branches pour l'implémentation des MCPs (`github`, `context7`) et des Hooks de sécurité.
    - La branche `feature/mcp-setup` a été créée mais il reste à configurer formellement le serveur MCP ou les scripts de skills/hooks.

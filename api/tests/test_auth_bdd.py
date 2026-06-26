@@ -1,32 +1,5 @@
 from pytest_bdd import scenarios, given, when, then, parsers
-from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
 import pytest
-from main import app
-from database import get_db, Base
-from sqlalchemy import create_engine
-from sqlalchemy.pool import StaticPool
-
-# In-memory DB setup
-SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
-TestingSessionLocal = lambda: Session(autocommit=False, autoflush=False, bind=engine)
-
-Base.metadata.create_all(bind=engine)
-
-def override_get_db():
-    try:
-        db = TestingSessionLocal()
-        yield db
-    finally:
-        db.close()
-
-app.dependency_overrides[get_db] = override_get_db
-client = TestClient(app)
 
 # Load scenarios
 scenarios("features/auth_collaboration.feature")
@@ -36,7 +9,7 @@ def context():
     return {}
 
 @given(parsers.parse('the user registers with username "{username}", email "{email}", and password "{password}"'))
-def register_user(username, email, password):
+def register_user(client, username, email, password):
     response = client.post(
         "/users",
         json={"username": username, "email": email, "password": password}
@@ -45,7 +18,7 @@ def register_user(username, email, password):
 
 @when(parsers.parse('the user logs in with username "{username}" and password "{password}"'))
 @given(parsers.parse('the user logs in with username "{username}" and password "{password}"'))
-def login_user(username, password, context):
+def login_user(client, username, password, context):
     response = client.post(
         "/token",
         data={"username": username, "password": password}
@@ -59,7 +32,7 @@ def check_token(context):
     assert "token" in context
 
 @when(parsers.parse('the user creates a task with title "{title}" assigned to "{assignee}"'))
-def create_task(title, assignee, context):
+def create_task(client, title, assignee, context):
     # First get the assignee ID
     users_resp = client.get("/users", headers=context["headers"])
     assert users_resp.status_code == 200
@@ -84,7 +57,7 @@ def check_task_assignee(assignee, context):
     assert task["assignee"]["username"] == assignee
 
 @when("the user lists tasks")
-def list_tasks(context):
+def list_tasks(client, context):
     response = client.get("/todos", headers=context["headers"])
     assert response.status_code == 200
     context["tasks"] = response.json()
