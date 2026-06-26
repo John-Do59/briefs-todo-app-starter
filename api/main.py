@@ -1,8 +1,11 @@
 """FastAPI application entry point."""
 
 from datetime import timedelta
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, status, Response
 from fastapi.security import OAuth2PasswordRequestForm
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 from sqlalchemy.orm import Session
 
 import crud
@@ -14,23 +17,29 @@ from auth import (
     create_access_token,
     get_current_active_user,
 )
+from config import settings
 from database import Base, engine, get_db
 from models import User
 
 # Create all tables on startup
 Base.metadata.create_all(bind=engine)
 
+# Set up rate limiting
+limiter = Limiter(key_func=get_remote_address, storage_uri="memory://")
 app = FastAPI(
     title="To-Do API",
     description="REST API for managing to-do tasks",
     version="0.2.0",
 )
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 # Auth endpoints
 @app.post("/token", response_model=Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    """Login to get access token."""
+@limiter.limit("5/minute")
+async def login_for_access_token(response: Response, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """Login to get access token (rate-limited)."""
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -42,7 +51,29 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
+    
+    # Set httponly cookie (secure only in production)
+    response.set_cookie(
+        key="access_token",
+        value=f"Bearer {access_token}",
+        httponly=True,
+        secure=settings.environment == "production",
+        samesite="lax",
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+    )
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@app.post("/users", response_model=schemas.UserResponse, status_code=201)
+@limiter.limit("10/minute")
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    """Create a new user (rate-limited)."""
+    # Check if username or email already exists
+    if crud.get_user_by_username(db, user.username):
+        raise HTTPException(status_code=400, detail="Username already registered")
+    if crud.get_user_by_email(db, user.email):
+        raise HTTPException(status_code=400, detail="Email already registered")
+    return crud.create_user(db, user)
 
 
 @app.get("/users/me", response_model=schemas.UserResponse)
