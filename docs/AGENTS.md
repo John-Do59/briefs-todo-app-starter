@@ -68,6 +68,37 @@ bun run preview                    # Preview the production build
 
 ---
 
+## Agent Extensions
+
+### Skills Directory (.claude/skills/)
+
+This directory contains reusable skills that extend the AI agent's capabilities.
+
+| Skill | Purpose |
+|-------|---------|
+| todo-app-test | Runs all tests for API and frontend |
+| todo-app-lint | Runs linting for the entire project |
+| todo-app-docker | Manages Docker Compose for the project |
+
+### Commands Directory (.claude/commands/)
+
+Custom commands that can be run via slash commands.
+
+| Command | Purpose |
+|---------|---------|
+| /start | Starts the Todo App with Docker Compose |
+| /test | Runs all Todo App tests |
+
+### Hooks Directory (.claude/hooks/)
+
+Event hooks that run automatically at specific times.
+
+| Hook | Purpose |
+|------|---------|
+| pre_commit_secrets.sh | Checks for secrets and .env files before commit |
+
+---
+
 ## File Summaries
 
 ### PROJECT_STRUCTURE.md
@@ -77,6 +108,7 @@ Project structure with two top-level applications. Key points:
 - `api/`: FastAPI application (models, schemas, CRUD, database)
 - `web/`: SvelteKit + Tailwind v4 frontend (routes, components, fetch client)
 - `docs/`: All documentation files
+- `.claude/`: Claude Code agent extensions (skills, commands, hooks)
 
 ### CONVENTIONS.md
 
@@ -231,4 +263,4 @@ Full gitmoji list: [gitmoji.dev](https://gitmoji.dev)
 
 ---
 
-*Last updated: 2026-04-29*
+*Last updated: 2026-06-26*

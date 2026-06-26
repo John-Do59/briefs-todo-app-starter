@@ -32,6 +32,15 @@ todo-app/
 │   ├── .gitignore
 │   └── README.md
 ├── .claude/                            # Claude Code configuration
+│   ├── skills/                         # Agent skills (auto-detected)
+│   │   ├── todo-app-test/         # Test runner skill
+│   │   ├── todo-app-lint/         # Linter skill
+│   │   └── todo-app-docker/       # Docker management skill
+│   ├── commands/                       # Slash commands
+│   │   ├── start.sh                    # /start - Start services
+│   │   └── test.sh                     # /test - Run all tests
+│   └── hooks/                          # Event hooks
+│       └── pre_commit_secrets.sh       # Pre-commit secret check
 ├── .github/                            # GitHub configuration
 │   ├── workflows/                      # CI/CD workflows
 │   │   ├── lint.yml                    # Markdown and YAML linting
