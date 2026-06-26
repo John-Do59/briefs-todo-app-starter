@@ -3,13 +3,15 @@
 Ce document récapitule la réalisation de toutes les étapes du brief métier pour le projet Todo App.
 
 ## Partie 1 : Contexte Statique
+
 - **Objectif** : Mettre en place la couche de contexte statique du projet.
-- **Réalisation** : 
+- **Réalisation** :
   - Fichier `AGENTS.md` (racine) mis à jour avec les commandes de base (Docker, Linting).
   - Dossier `docs/` enrichi et documenté (`AGENTS.md` détaillé, `PROJECT_STRUCTURE.md`, `CONVENTIONS.md`, etc.).
   - Le contexte statique est persistant et versionné dans Git.
 
 ## Partie 2 : Skills, Commands, Hooks & MCP
+
 - **Objectif** : Étendre les capacités de l'agent.
 - **Réalisation** :
   - **Skills** : 3 skills ajoutées dans `.claude/skills` (`docker_manage.md`, `lint_check.md`, `test_runner.md`).
@@ -18,6 +20,7 @@ Ce document récapitule la réalisation de toutes les étapes du brief métier p
   - **MCP** : Fichier `mcp.json` configuré pour les serveurs `github`, `context7` et `sqlite`, et documenté.
 
 ## Partie 3 : Outillage du Projet (Piliers)
+
 - **Objectif** : Outiller le projet pour 4 piliers sur 8 (selon la grille d'évaluation d'infrastructure).
 - **Réalisation (Nous couvrons plus de 4 piliers)** :
   1. **Testing** : Pipeline BDD implémenté et validé.
@@ -27,6 +30,7 @@ Ce document récapitule la réalisation de toutes les étapes du brief métier p
   5. **Standards** : Contrôle du formattage via `markdownlint`, `yamllint`, type checking SvelteKit, conformité Gitmoji.
 
 ## Partie 4 : Spec Driven Development
+
 - **Objectif** : Écrire des spécifications en utilisant un framework SDD.
 - **Réalisation** :
   - Tests BDD implémentés (`feature/auth-collaboration`) en Gherkin (`.feature`) et exécutés via Pytest-bdd.
